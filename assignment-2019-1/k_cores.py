@@ -1,31 +1,33 @@
 #Created by Omiros Papadopoulos // assignment-2019-1
 import sys
 
-pairs = []
+pairs = []    # Initialize list pair
 nodes = set() # Create a set to keep the unique node numbers
-adjlist = {}  # Craete the adjacent list
+adjlist = {}  # Create the adjacent list
 
+# sys.argv[1]
 # Open and Read file
 with open(sys.argv[1], 'r') as graph:
-	# Read each line of the file and recognize the pairs of nodes
+    # Read each line of the file and recognize the pairs of nodes
     for line in graph:
         temp_line = line.strip('\n').split(' ')
         # temp_line is a list with 2 elements. E.g. ['a', 'b']
         for node in temp_line:
-            nodes.add(node)
+            # By adding node as int() the nodes set is sorted in ASC order
+            nodes.add(int(node))
             # Initialize the adjacent list for each node
             adjlist[node] = []
-        # Create pairs as tuples. E.g. ('a','b')
-        pair = (temp_line[1], temp_line[0])
-        pairs.append(pair)
+        # pair = [temp_line[0], temp_line[1]]
+        pairs.append([temp_line[0], temp_line[1]])
 
 # Creating the adjacent list by checking all the pairs of nodes
+# EG: {'0': ['1', '3', '7'],'1':['2', '3', '6']}
 for p in pairs:
     adjlist[p[0]].append(p[1])
     adjlist[p[1]].append(p[0])
 
 # ===================================================================================
-# CREATE THE HEAP ALGORITHM MANUALLY AS PER
+#              CREATE THE HEAP ALGORITHM MANUALLY AS PER
 # https://nbviewer.jupyter.org/urls/louridas.github.io/rwa/notebooks/chapter_03.ipynb
 
 # We create a priority queue by creating an empty list:
@@ -99,9 +101,9 @@ def extract_min_from_pq(pq):
         exchange(pq, i, j)
         i = j
     return c
-# end of
-# ===============================================================
 
+#                               end of HEAP algorithm
+# ===================================================================================
 
 min_queue = create_pq() # Initialize heap with minimums
 degree = {}  # Initialize dictionary with the degree of each node
@@ -111,11 +113,11 @@ core = {}    # Initialize core number of each node after calculation
 # Initiate values
 for node in nodes:
     # Degree is equal to the No of neighbors
-    degree[node] = len(adjlist[node])
+    degree[str(node)] = len(adjlist[str(node)])
     # Potential core number (p_core) = degree of node
-    p_core[node] = degree[node]
-    core[node] = 0
-    p_node = [int(p_core[node]), node] # [neighbors, node number]
+    p_core[str(node)] = degree[str(node)]
+    core[str(node)] = 0
+    p_node = [int(p_core[str(node)]), str(node)] # [neighbors, node number]
     # Create a heap structure to store the node number and its degree number
     insert_in_pq(min_queue, p_node)
 
@@ -126,11 +128,12 @@ npn = {} # Initialise new potential node dictionary
 while len(min_queue) > 0:
     # Extract the min item from the heap (min_queue)
     t = extract_min_from_pq(min_queue)
+    # print("T: ",t)
     core[t[1]] = t[0]
     if len(min_queue) != 0:
         for n in adjlist[t[1]]:
             # For each of the neighbor
-            degree[n] = degree[n] - 1
+            degree[n] -= 1
             # Store the neighbor's OLD potential core number
             opn[n] = [p_core[n], n]
             # Update the neighbor's core number. Max of (core number of current node t[0] OR updated degree of neighbor)
@@ -142,6 +145,7 @@ while len(min_queue) > 0:
                 if item[1] == str(n):
                     # Update opn with npd in the heap
                     item[0] = p_core[n]
+
 
 # Check how it works
 for i in range(len(core)):
