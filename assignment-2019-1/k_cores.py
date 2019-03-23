@@ -1,11 +1,9 @@
-#Created by Omiros Papadopoulos // assignment-2019-1
 import sys
 
 pairs = []    # Initialize list pair
 nodes = set() # Create a set to keep the unique node numbers
 adjlist = {}  # Create the adjacent list
 
-# sys.argv[1]
 # Open and Read file
 with open(sys.argv[1], 'r') as graph:
     # Read each line of the file and recognize the pairs of nodes
@@ -76,7 +74,7 @@ def insert_in_pq(pq, c):
         exchange(pq, i, p)
         i = p
 
-# --- EXTRACTION ---
+# EXTRACTION
 # To do that, we must use a helper function that will extract the last element of the queue
 def extract_last_from_pq(pq):
     return pq.pop()
@@ -113,6 +111,7 @@ core = {}    # Initialize core number of each node after calculation
 # Initiate values
 for node in nodes:
     # Degree is equal to the No of neighbors
+    # Adding str(node) because dictionaries only accept str key values
     degree[str(node)] = len(adjlist[str(node)])
     # Potential core number (p_core) = degree of node
     p_core[str(node)] = degree[str(node)]
@@ -120,7 +119,6 @@ for node in nodes:
     p_node = [int(p_core[str(node)]), str(node)] # [neighbors, node number]
     # Create a heap structure to store the node number and its degree number
     insert_in_pq(min_queue, p_node)
-
 
 opn = {} # Initialise old potential node dictionary
 npn = {} # Initialise new potential node dictionary
@@ -140,13 +138,12 @@ while len(min_queue) > 0:
             p_core[n] = max(t[0], degree[n])
             # New potential node
             npn[n] = [p_core[n], n]
-             # Update the heap
+             # Update the heap by swapping opn and npn
             for item in min_queue:
                 if item[1] == str(n):
                     # Update opn with npd in the heap
                     item[0] = p_core[n]
 
-
-# Check how it works
+# Print Node number, Core number
 for i in range(len(core)):
     print(i, core[str(i)])
